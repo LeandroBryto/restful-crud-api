@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.plaf.PanelUI;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,4 +50,18 @@ public class ProductController {
         productO.get().add(linkTo(methodOn(ProductController.class).getAllProducts()).withRel("Products list"));
         return ResponseEntity.status(HttpStatus.OK).body(productO.get());
     }
+    @PutMapping("products/{id}")
+    public ResponseEntity<Object>updateProducts(@PathVariable(value = "id") UUID id,
+                                                @RequestBody @Valid ProductRecordDto productRecordDto){
+        Optional<ProductModel> productO = productRepository.findById(id);
+        if (productO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Products not found");
+        }
+        var productModel = productO.get();
+        BeanUtils.copyProperties(productRecordDto, productModel);
+        return ResponseEntity.status(HttpStatus.OK).body(productRepository.save(productModel));
+    }
+
+  
+
 }
